@@ -2,12 +2,15 @@ package recipeolga.Controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import recipeolga.Model.Ingredient;
 import recipeolga.Services.IngredientService;
 
+import javax.validation.Valid;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,14 +22,27 @@ public class IngredientController {
     private final IngredientService ingredientService;
 
     @GetMapping("/{id}")
-    Ingredient getIngredient(@PathVariable Integer id) {
-        return ingredientService.getIngredient(id);
+    ResponseEntity<Ingredient> getIngredient(@PathVariable Integer id) {
+        Ingredient ingredient = ingredientService.getIngredient(id);
+        return ResponseEntity.ok(ingredient);
     }
 
     @PostMapping
-    Ingredient addIngredient(@RequestBody Ingredient ingredient) {
-        return ingredientService.addIngredient(ingredient);
+    ResponseEntity<Ingredient> addIngredient(@Valid @RequestBody Ingredient ingredient) {
+        return ResponseEntity.ok(ingredientService.addIngredient(ingredient));
     }
+
+    @GetMapping
+    public Collection<Ingredient> getAll() {
+        return this.ingredientService.getAll();
+    }
+
+    @PutMapping("/{id}")
+    ResponseEntity<Ingredient> updateIngredient(@PathVariable Integer id, @Valid @RequestBody Ingredient ingredient) {
+        return ResponseEntity.ok(ingredientService.updateIngredient(id, ingredient));
+    }
+
+
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
