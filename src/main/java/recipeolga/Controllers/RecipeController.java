@@ -1,5 +1,10 @@
 package recipeolga.Controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+import org.webjars.NotFoundException;
 import recipeolga.Model.Recipe;
 import recipeolga.Services.RecipeService;
 
@@ -40,13 +46,27 @@ public class RecipeController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Удаление рецептов по ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Рецепт удалён")
+    })
+    @Parameters(value = {@Parameter(name = "id", example = "1")})
     ResponseEntity<Recipe> removeRecipe(@PathVariable Integer id) {
         return ResponseEntity.ok(recipeService.removeRecipe(id));
     }
 
     @GetMapping
-    ResponseEntity<Collection<Recipe>> getRecipesByIngredientId() {
-        return ResponseEntity.ok(recipeService.getAll());
+    @Operation(summary = "Получение рецептов по ID ингредиента")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Рецепты получены")})
+    @Parameters(value = {@Parameter(name = "id", example = "1")})
+    ResponseEntity<Collection<Recipe>> getRecipesByIngredientId(@RequestParam Integer ingredient) {
+        return ResponseEntity.ok(recipeService.getByIngredientId(ingredient));
+    }
+
+    @GetMapping("/list")
+    ResponseEntity<Collection<Recipe>> getRecipeByPage(@RequestParam("page") int page, @RequestParam("size") int size) {
+        return ResponseEntity.ok(recipeService.getAll(page, size));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -59,5 +79,11 @@ public class RecipeController {
             errors.put(fieldName, errorMessage);
         });
         return errors;
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    public String handleNotFoundException(NotFoundException notFoundException) {
+        return notFoundException.getMessage();
     }
 }

@@ -12,7 +12,11 @@ public interface RecipeService {
 
     Collection<Recipe> getAll();
 
+    Collection<Recipe> getAll(int page, int size);
+
     Recipe removeRecipe(int id);
 
     Recipe updateRecipe(int id, Recipe recipe);
+
+    Collection<Recipe> getByIngredientId(Integer ingredientId);
 }

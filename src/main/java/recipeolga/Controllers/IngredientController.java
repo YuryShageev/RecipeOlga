@@ -1,6 +1,9 @@
 package recipeolga.Controllers;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -42,7 +45,10 @@ public class IngredientController {
         return ResponseEntity.ok(ingredientService.updateIngredient(id, ingredient));
     }
 
-
+    @Parameters(value = {@Parameter(name = "id", example = "1")})
+    ResponseEntity<Ingredient> removeIngredient(@PathVariable Integer id) {
+        return ResponseEntity.ok(ingredientService.removeIngredient(id));
+    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
